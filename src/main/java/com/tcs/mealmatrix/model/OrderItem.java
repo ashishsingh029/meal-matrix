@@ -1,4 +1,4 @@
-package com.tcs.mealmatrix.models;
+package com.tcs.mealmatrix.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,34 +6,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
-@Table(
-        name = "cart_items",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "menu_item_id"})
-)
+@Table(name = "order_items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItem {
+public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 
     @Column(nullable = false)
-    private Integer quantity = 1;
+    private Integer quantity;
 
-    @Column(name = "added_at")
-    private LocalDateTime addedAt = LocalDateTime.now();
+    @Column(name = "price_at_time", nullable = false, precision = 10, scale = 2)
+    private BigDecimal priceAtTime;
 }

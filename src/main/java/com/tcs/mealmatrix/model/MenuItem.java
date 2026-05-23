@@ -1,6 +1,6 @@
-package com.tcs.mealmatrix.models;
+package com.tcs.mealmatrix.model;
 
-import com.tcs.mealmatrix.enums.Category;
+import com.tcs.mealmatrix.constant.Category;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class MenuItem {
     private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private Double price;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

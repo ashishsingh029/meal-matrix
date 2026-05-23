@@ -1,13 +1,14 @@
-package com.tcs.mealmatrix.models;
+package com.tcs.mealmatrix.model;
 
-import com.tcs.mealmatrix.enums.PaymentMethod;
-import com.tcs.mealmatrix.enums.Status;
+import com.tcs.mealmatrix.constant.PaymentMethod;
+import com.tcs.mealmatrix.constant.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,13 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private AppUser appUser;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false, length = 10)

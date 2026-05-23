@@ -1,4 +1,4 @@
-package com.tcs.mealmatrix.enums;
+package com.tcs.mealmatrix.constant;
 
 public enum PaymentMethod {
     UPI,

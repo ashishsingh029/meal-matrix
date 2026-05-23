@@ -1,10 +1,8 @@
-package com.tcs.mealmatrix.models;
+package com.tcs.mealmatrix.model;
 
+import com.tcs.mealmatrix.constant.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+@Builder
+public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +28,17 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(length = 10, nullable = false)
+    @Column(length = 15, nullable = false)
     private String phone;
 
+    @Column(length = 255, nullable = false)
+    private String address;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String role = "ROLE_USER";
+    private Role role = Role.ROLE_USER;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
 }
