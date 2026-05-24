@@ -1,5 +1,6 @@
 package com.tcs.mealmatrix.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,33 +23,62 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
-    public void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        if(httpServletRequest.getRequestURI().startsWith("/api/auth")) {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        // Skip auth endpoints
+        if (request.getRequestURI().startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        String authHeader = httpServletRequest.getHeader("Authorization");
-        System.out.println("authHeader: " + authHeader);
+        final String authHeader = request.getHeader("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            filterChain.doFilter(request, response);
             return;
         }
-        String token = authHeader.substring(7);
-        String email = jwtService.extractUsername(token);
 
-        System.out.println("email: " + email);
-        if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
-            if(jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                System.out.println("Auth Token: " + authToken);
+        try {
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            String token = authHeader.substring(7);
+
+            String email = jwtService.extractUsername(token);
+
+            if (email != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails =
+                        customUserDetailsService.loadUserByUsername(email);
+
+                if (jwtService.validateToken(token, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+                }
             }
+
+        } catch (JwtException | IllegalArgumentException e) {
+
+            System.out.println("Invalid JWT Token: " + e.getMessage());
+
         }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+
+        filterChain.doFilter(request, response);
     }
 }

@@ -1,38 +1,29 @@
 package com.tcs.mealmatrix.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
+@Getter
 public class AdminInitializer {
-    private final String ADMIN_EMAIL;
-    private final Map<String, UserDetails> inMemoryAdmins;
 
-    public AdminInitializer(@Value("${admin.email}") String ADMIN_EMAIL, @Value("${admin.password}") String ADMIN_PASSWORD, PasswordEncoder passwordEncoder) {
-        this.ADMIN_EMAIL = ADMIN_EMAIL;
-        inMemoryAdmins = new ConcurrentHashMap<>();
+    private final String adminEmail;
+    private final String adminPassword;
 
-        UserDetails admin = User.builder()
-                .username(ADMIN_EMAIL)
-                .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                .roles("ADMIN")
-                .build();
-        inMemoryAdmins.put(ADMIN_EMAIL, admin);
-        System.out.println("IN Memory admin added and loaded successfully");
-    }
+    public AdminInitializer(
+            @Value("${admin.email}") String adminEmail,
+            @Value("${admin.password}") String adminPassword
+    ) {
 
-    public Optional<UserDetails> findAdminByEmail(String email) {
-        return Optional.ofNullable(inMemoryAdmins.get(email));
+        this.adminEmail = adminEmail;
+        this.adminPassword = adminPassword;
+
+        System.out.println("ADMIN EMAIL = " + adminEmail);
+        System.out.println("ADMIN PASSWORD = " + adminPassword);
     }
 
     public boolean isAdminEmail(String email) {
-        return ADMIN_EMAIL.equalsIgnoreCase(email);
+        return adminEmail.equalsIgnoreCase(email);
     }
 }
